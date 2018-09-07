@@ -160,8 +160,40 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
                                             y: 0.0,
                                             width: imageSize.width,
                                             height: imageSize.height))
-        let newImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        var newImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
+        
+        let orientation: UIDeviceOrientation = UIDevice.current.orientation
+        switch orientation {
+        case .landscapeLeft, .landscapeRight:
+            // rotate if orientation is landscape
+            newImage = rotateImage(image: newImage,radians: (3 * .pi)/2)
+        default:
+            break
+        }
+        
+        return newImage
+    }
+    
+    func rotateImage(image: UIImage!, radians: Float) -> UIImage {
+        var newSize = CGRect(origin: CGPoint.zero, size: image.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
+        // Trim off the extremely small float value to prevent core graphics from rounding it up
+        newSize.width = floor(newSize.width)
+        newSize.height = floor(newSize.height)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, true, image.scale)
+        let context = UIGraphicsGetCurrentContext()!
+        
+        // Move origin to middle
+        context.translateBy(x: newSize.width/2, y: newSize.height/2)
+        // Rotate around middle
+        context.rotate(by: CGFloat(radians))
+        
+        image.draw(in: CGRect(x: -image.size.width/2, y: -image.size.height/2, width: image.size.width, height: image.size.height))
+        
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        
         return newImage
     }
     
