@@ -165,9 +165,12 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
         
         let orientation: UIDeviceOrientation = UIDevice.current.orientation
         switch orientation {
-        case .landscapeLeft, .landscapeRight:
+        case .landscapeLeft:
+            // rotate if orientation is landscape 270
+            newImage = adjustOrientation(image: newImage,radians: (3 * .pi)/2)
+        case  .landscapeRight:
             // rotate if orientation is landscape
-            newImage = rotateImage(image: newImage,radians: (3 * .pi)/2)
+            newImage = adjustOrientation(image: newImage,radians: (.pi)/2)
         default:
             break
         }
@@ -175,8 +178,8 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
         return newImage
     }
     
-    func rotateImage(image: UIImage!, radians: Float) -> UIImage {
-        var newSize = CGRect(origin: CGPoint.zero, size: image.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
+    func adjustOrientation(image: UIImage!, radians: Float) -> UIImage {
+        var newSize = CGRect(origin: CGPoint.zero, size: CGSize(width: image.size.height, height:image.size.width)).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
         // Trim off the extremely small float value to prevent core graphics from rounding it up
         newSize.width = floor(newSize.width)
         newSize.height = floor(newSize.height)
@@ -189,7 +192,8 @@ public class YPCameraVC: UIViewController, UIGestureRecognizerDelegate, YPPermis
         // Rotate around middle
         context.rotate(by: CGFloat(radians))
         
-        image.draw(in: CGRect(x: -image.size.width/2, y: -image.size.height/2, width: image.size.width, height: image.size.height))
+
+        image.draw(in: CGRect(x: -image.size.height/2, y: -image.size.width/2, width: image.size.height, height: image.size.width))
         
         let newImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
