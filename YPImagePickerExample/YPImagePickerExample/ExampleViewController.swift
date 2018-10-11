@@ -139,6 +139,9 @@ class ExampleViewController: UIViewController {
         /* Defines if the status bar should be hidden when showing the picker. Default is true */
         config.hidesStatusBar = false
 
+        /* Defines if the bottom bar should be hidden when showing the picker. Default is false */
+        config.hidesBottomBar = false
+
         config.library.maxNumberOfItems = 5
         
         /* Disable scroll to change between mode */
@@ -239,6 +242,6 @@ extension ExampleViewController {
     func resolutionForLocalVideo(url: URL) -> CGSize? {
         guard let track = AVURLAsset(url: url).tracks(withMediaType: AVMediaType.video).first else { return nil }
         let size = track.naturalSize.applying(track.preferredTransform)
-        return CGSize(width: fabs(size.width), height: fabs(size.height))
+        return CGSize(width: abs(size.width), height: abs(size.height))
     }
 }
