@@ -46,6 +46,7 @@ public class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
     override public func viewDidLoad() {
         super.viewDidLoad()
 
+        view.backgroundColor = YPConfig.colors.filterBackgroundColor
         trimmerView.mainColor = YPConfig.colors.trimmerMainColor
         trimmerView.handleColor = YPConfig.colors.trimmerHandleColor
         trimmerView.positionBarColor = YPConfig.colors.positionLineColor
@@ -80,7 +81,6 @@ public class YPVideoFiltersVC: UIViewController, IsMediaFilterVC {
                                                                style: .plain,
                                                                target: self,
                                                                action: #selector(cancel))
-            navigationItem.leftBarButtonItem?.tintColor = YPConfig.colors.tintColor
         }
         setupRightBarButtonItem()
     }
