@@ -38,6 +38,9 @@ public struct YPColors {
     /// A color for background in filters.
     public var filterBackgroundColor: UIColor = .offWhiteOrBlack
 
+    /// A color for background in selections gallery. When multiple items selected.
+    public var selectionsBackgroundColor: UIColor = .offWhiteOrBlack
+
     /// A color for bottom buttons (photo, video, all photos).
     public var bottomMenuItemBackgroundColor: UIColor = .clear
 
@@ -67,4 +70,11 @@ public struct YPColors {
     public var progressBarTrackColor: UIColor = .ypSystemBackground
     /// The color of completed track for the progress bar
     public var progressBarCompletedColor: UIColor?
+    
+    /// The color of the Album's NavigationBar background
+    public var albumBarTintColor: UIColor = .ypSystemBackground
+    /// The color of the Album's left and right items color
+    public var albumTintColor: UIColor = .ypLabel
+    /// The color of the Album's title color
+    public var albumTitleColor: UIColor = .ypLabel
 }

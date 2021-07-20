@@ -64,13 +64,13 @@ class ExampleViewController: UIViewController {
     // MARK: - Configuration
     @objc
     func showPicker() {
-        
+
         var config = YPImagePickerConfiguration()
 
         /* Uncomment and play around with the configuration 👨‍🔬 🚀 */
 
         /* Set this to true if you want to force the  library output to be a squared image. Defaults to false */
-//         config.library.onlySquare = true
+        // config.library.onlySquare = true
 
         /* Set this to true if you want to force the camera output to be a squared image. Defaults to true */
         // config.onlySquareImagesFromCamera = false
@@ -81,7 +81,7 @@ class ExampleViewController: UIViewController {
 
         /* Choose what media types are available in the library. Defaults to `.photo` */
         config.library.mediaType = .photoAndVideo
-
+		config.library.itemOverlayType = .grid
         /* Enables selecting the front camera by default, useful for avatars. Defaults to false */
         // config.usesFrontCamera = true
 
@@ -89,18 +89,21 @@ class ExampleViewController: UIViewController {
         // config.showsFilters = false
 
         /* Manage filters by yourself */
-//        config.filters = [YPFilter(name: "Mono", coreImageFilterName: "CIPhotoEffectMono"),
-//                          YPFilter(name: "Normal", coreImageFilterName: "")]
-//        config.filters.remove(at: 1)
-//        config.filters.insert(YPFilter(name: "Blur", coreImageFilterName: "CIBoxBlur"), at: 1)
+        // config.filters = [YPFilter(name: "Mono", coreImageFilterName: "CIPhotoEffectMono"),
+        //                   YPFilter(name: "Normal", coreImageFilterName: "")]
+        // config.filters.remove(at: 1)
+        // config.filters.insert(YPFilter(name: "Blur", coreImageFilterName: "CIBoxBlur"), at: 1)
 
         /* Enables you to opt out from saving new (or old but filtered) images to the
            user's photo library. Defaults to true. */
         config.shouldSaveNewPicturesToAlbum = false
 
         /* Choose the videoCompression. Defaults to AVAssetExportPresetHighestQuality */
-        config.video.compression = AVAssetExportPresetMediumQuality
-        
+        config.video.compression = AVAssetExportPresetPassthrough
+
+        /* Choose the recordingSizeLimit. If not setted, then limit is by time. */
+        // config.video.recordingSizeLimit = 10000000
+
         /* Defines the name of the album when saving pictures in the user's photo library.
            In general that would be your App name. Defaults to "DefaultYPImagePickerAlbumName" */
         // config.albumName = "ThisIsMyAlbum"
@@ -112,9 +115,9 @@ class ExampleViewController: UIViewController {
         /* Defines which screens are shown at launch, and their order.
            Default value is `[.library, .photo]` */
         config.screens = [.library, .photo, .video]
-        
+
         /* Can forbid the items with very big height with this property */
-//        config.library.minWidthForItem = UIScreen.main.bounds.width * 0.8
+        // config.library.minWidthForItem = UIScreen.main.bounds.width * 0.8
 
         /* Defines the time limit for recording videos.
            Default is 30 seconds. */
@@ -141,30 +144,29 @@ class ExampleViewController: UIViewController {
 
         /* Defines if the bottom bar should be hidden when showing the picker. Default is false */
         config.hidesBottomBar = false
-        
+
         config.maxCameraZoomFactor = 2.0
 
         config.library.maxNumberOfItems = 5
         config.gallery.hidesRemoveButton = false
-        
+
         /* Disable scroll to change between mode */
         // config.isScrollToChangeModesEnabled = false
-//        config.library.minNumberOfItems = 2
-        
+        // config.library.minNumberOfItems = 2
+
         /* Skip selection gallery after multiple selections */
         // config.library.skipSelectionsGallery = true
 
         /* Here we use a per picker configuration. Configuration is always shared.
            That means than when you create one picker with configuration, than you can create other picker with just
            let picker = YPImagePicker() and the configuration will be the same as the first picker. */
-        
-        
+
         /* Only show library pictures from the last 3 days */
         //let threDaysTimeInterval: TimeInterval = 3 * 60 * 60 * 24
         //let fromDate = Date().addingTimeInterval(-threDaysTimeInterval)
         //let toDate = Date()
         //let options = PHFetchOptions()
-        //options.predicate = NSPredicate(format: "creationDate > %@ && creationDate < %@", fromDate as CVarArg, toDate as CVarArg)
+        // options.predicate = NSPredicate(format: "creationDate > %@ && creationDate < %@", fromDate as CVarArg, toDate as CVarArg)
         //
         ////Just a way to set order
         //let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
@@ -173,23 +175,32 @@ class ExampleViewController: UIViewController {
         //config.library.options = options
 
         config.library.preselectedItems = selectedItems
-        
+
+
+		// Customise fonts
+		//config.fonts.menuItemFont = UIFont.systemFont(ofSize: 22.0, weight: .semibold)
+		//config.fonts.pickerTitleFont = UIFont.systemFont(ofSize: 22.0, weight: .black)
+		//config.fonts.rightBarButtonFont = UIFont.systemFont(ofSize: 22.0, weight: .bold)
+		//config.fonts.navigationBarTitleFont = UIFont.systemFont(ofSize: 22.0, weight: .heavy)
+		//config.fonts.leftBarButtonFont = UIFont.systemFont(ofSize: 22.0, weight: .heavy)
+
         let picker = YPImagePicker(configuration: config)
+
+        picker.imagePickerDelegate = self
 
         /* Change configuration directly */
         // YPImagePickerConfiguration.shared.wordings.libraryTitle = "Gallery2"
-        
 
         /* Multiple media implementation */
         picker.didFinishPicking { [unowned picker] items, cancelled in
-            
+
             if cancelled {
                 print("Picker was canceled")
                 picker.dismiss(animated: true, completion: nil)
                 return
             }
             _ = items.map { print("🧀 \($0)") }
-            
+
             self.selectedItems = items
             if let firstItem = items.first {
                 switch firstItem {
@@ -198,12 +209,12 @@ class ExampleViewController: UIViewController {
                     picker.dismiss(animated: true, completion: nil)
                 case .video(let video):
                     self.selectedImageV.image = video.thumbnail
-                    
+
                     let assetURL = video.url
                     let playerVC = AVPlayerViewController()
                     let player = AVPlayer(playerItem: AVPlayerItem(url:assetURL))
                     playerVC.player = player
-                
+
                     picker.dismiss(animated: true, completion: { [weak self] in
                         self?.present(playerVC, animated: true, completion: nil)
                         print("😀 \(String(describing: self?.resolutionForLocalVideo(url: assetURL)!))")
@@ -248,5 +259,14 @@ extension ExampleViewController {
         guard let track = AVURLAsset(url: url).tracks(withMediaType: AVMediaType.video).first else { return nil }
         let size = track.naturalSize.applying(track.preferredTransform)
         return CGSize(width: abs(size.width), height: abs(size.height))
+    }
+}
+
+// YPImagePickerDelegate
+extension ExampleViewController: YPImagePickerDelegate {
+    func noPhotos() {}
+
+    func shouldAddToSelection(indexPath: IndexPath, numSelections: Int) -> Bool {
+        return true// indexPath.row != 2
     }
 }
